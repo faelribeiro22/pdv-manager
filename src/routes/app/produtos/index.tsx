@@ -78,14 +78,14 @@ function ProdutosPage() {
   }
 
   return (
-    <div className="p-6 space-y-5">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Produtos</h1>
+    <div className="p-4 sm:p-6 space-y-5">
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Produtos</h1>
         <Link
           to="/app/produtos/novo"
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors shrink-0"
         >
-          <Plus size={16} />Novo Produto
+          <Plus size={16} /><span className="hidden sm:inline">Novo Produto</span><span className="sm:hidden">Novo</span>
         </Link>
       </div>
 
@@ -122,11 +122,12 @@ function ProdutosPage() {
         </div>
       ) : (
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <table className="w-full text-sm">
+          {/* Desktop table */}
+          <table className="w-full text-sm hidden md:table">
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                 <th className="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Produto</th>
-                <th className="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-400 hidden sm:table-cell">Categoria</th>
+                <th className="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Categoria</th>
                 <th className="text-right px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Preço</th>
                 <th className="text-right px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Estoque</th>
                 <th className="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Status</th>
@@ -150,7 +151,7 @@ function ProdutosPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-4 py-3 hidden sm:table-cell">
+                    <td className="px-4 py-3">
                       {p.categories ? (
                         <span className="px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: p.categories.color + '20', color: p.categories.color }}>
                           {p.categories.name}
@@ -187,6 +188,57 @@ function ProdutosPage() {
               })}
             </tbody>
           </table>
+
+          {/* Mobile card list */}
+          <div className="md:hidden divide-y divide-gray-100 dark:divide-gray-800">
+            {products.map((p) => {
+              const lowStock = p.stock_qty <= p.min_stock && p.min_stock > 0
+              const outOfStock = p.stock_qty <= 0
+              return (
+                <div key={p.id} className={`p-4 ${lowStock ? 'bg-amber-50/50 dark:bg-amber-900/10' : ''}`}>
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-lg flex items-center justify-center shrink-0">
+                      <Package size={16} className="text-gray-400" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="min-w-0">
+                          <p className="font-medium text-gray-800 dark:text-gray-200 truncate">{p.name}</p>
+                          {p.barcode && <p className="text-xs text-gray-400 truncate">{p.barcode}</p>}
+                        </div>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button
+                            onClick={() => navigate({ to: '/app/produtos/$productId', params: { productId: p.id } })}
+                            className="text-gray-400 hover:text-indigo-600 p-1"
+                          >
+                            <Edit2 size={16} />
+                          </button>
+                          <button onClick={() => handleDelete(p.id)} className="text-gray-400 hover:text-red-500 p-1">
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2 mt-2">
+                        <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">{fmt(p.price)}</span>
+                        <span className={`text-xs font-medium ${outOfStock ? 'text-red-600 dark:text-red-400' : lowStock ? 'text-amber-600 dark:text-amber-400' : 'text-gray-500 dark:text-gray-400'}`}>
+                          {p.stock_qty} {p.unit}
+                          {lowStock && !outOfStock && <AlertTriangle size={10} className="inline ml-0.5" />}
+                        </span>
+                        {p.categories && (
+                          <span className="px-2 py-0.5 rounded-full text-xs font-medium" style={{ backgroundColor: p.categories.color + '20', color: p.categories.color }}>
+                            {p.categories.name}
+                          </span>
+                        )}
+                        <span className={`px-1.5 py-0.5 rounded-full text-xs font-medium ${p.active ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'}`}>
+                          {p.active ? 'Ativo' : 'Inativo'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
       )}
     </div>

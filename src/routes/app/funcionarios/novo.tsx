@@ -89,7 +89,7 @@ function NovoFuncionarioPage() {
 
   if (credentials) {
     return (
-      <div className="p-6 max-w-md mx-auto">
+      <div className="p-4 sm:p-6 max-w-md mx-auto">
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 text-center">
           <CheckCircle size={48} className="text-green-500 mx-auto mb-3" />
           <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Funcionário Criado!</h2>
@@ -111,15 +111,15 @@ function NovoFuncionarioPage() {
   }
 
   return (
-    <div className="p-6 max-w-md mx-auto">
+    <div className="p-4 sm:p-6 max-w-md mx-auto">
       <div className="flex items-center gap-4 mb-6">
         <button onClick={() => navigate({ to: '/app/funcionarios' })} className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
           <ArrowLeft size={22} />
         </button>
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Convidar Funcionário</h1>
+        <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Convidar Funcionário</h1>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+      <form onSubmit={handleSubmit(onSubmit)} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 space-y-4">
         {error && <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg p-3 text-sm">{error}</div>}
 
         <div>

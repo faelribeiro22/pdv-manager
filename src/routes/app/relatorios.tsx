@@ -106,9 +106,9 @@ function RelatoriosPage() {
   const maxPayment = data ? Math.max(...Object.values(data.byPayment), 1) : 1
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Relatórios</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Relatórios</h1>
         <div className="flex items-center gap-2 flex-wrap">
           {(['today', 'week', 'month', 'custom'] as DateRange[]).map((r) => (
             <button
@@ -120,12 +120,12 @@ function RelatoriosPage() {
             </button>
           ))}
           {range === 'custom' && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto">
               <input type="date" value={customFrom} onChange={(e) => setCustomFrom(e.target.value)}
-                className="border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                className="border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 flex-1 sm:flex-none min-w-0" />
               <span className="text-gray-400">-</span>
               <input type="date" value={customTo} onChange={(e) => setCustomTo(e.target.value)}
-                className="border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500" />
+                className="border border-gray-300 dark:border-gray-600 rounded-lg px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 flex-1 sm:flex-none min-w-0" />
             </div>
           )}
         </div>
@@ -138,34 +138,34 @@ function RelatoriosPage() {
       ) : (
         <>
           {/* Summary cards */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4">
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-500 dark:text-gray-400">Receita Total</span>
-                <TrendingUp size={18} className="text-green-500" />
+                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Receita Total</span>
+                <TrendingUp size={18} className="text-green-500 hidden sm:block" />
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{fmt(data?.totalRevenue ?? 0)}</p>
+              <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{fmt(data?.totalRevenue ?? 0)}</p>
             </div>
-            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-500 dark:text-gray-400">Transações</span>
-                <ShoppingBag size={18} className="text-indigo-500" />
+                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Transações</span>
+                <ShoppingBag size={18} className="text-indigo-500 hidden sm:block" />
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{data?.transactionCount ?? 0}</p>
+              <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{data?.transactionCount ?? 0}</p>
             </div>
-            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-500 dark:text-gray-400">Ticket Médio</span>
-                <Users size={18} className="text-blue-500" />
+                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Ticket Médio</span>
+                <Users size={18} className="text-blue-500 hidden sm:block" />
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{fmt(data?.avgTicket ?? 0)}</p>
+              <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{fmt(data?.avgTicket ?? 0)}</p>
             </div>
-            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
+            <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3 sm:p-5">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-500 dark:text-gray-400">Descontos</span>
-                <Calendar size={18} className="text-amber-500" />
+                <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Descontos</span>
+                <Calendar size={18} className="text-amber-500 hidden sm:block" />
               </div>
-              <p className="text-2xl font-bold text-gray-900 dark:text-white">{fmt(data?.totalDiscount ?? 0)}</p>
+              <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{fmt(data?.totalDiscount ?? 0)}</p>
             </div>
           </div>
 

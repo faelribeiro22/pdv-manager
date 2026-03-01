@@ -75,7 +75,7 @@ function RegisterPage() {
           <h1 className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">PDV Manager</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2">Criar nova conta</p>
         </div>
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
           {/* Step indicator */}
           <div className="flex items-center mb-6">
             <div className={`flex items-center justify-center w-8 h-8 rounded-full text-sm font-semibold ${step >= 1 ? 'bg-indigo-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400'}`}>1</div>

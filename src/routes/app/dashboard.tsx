@@ -98,9 +98,9 @@ function DashboardPage() {
   const maxPayment = data ? Math.max(...Object.values(data.paymentBreakdown), 1) : 1
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
         <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">Resumo de hoje — {currentEstablishment.name}</p>
       </div>
 
@@ -223,14 +223,14 @@ function StatCard({ title, value, icon, color }: { title: string; value: string;
     blue: 'bg-blue-50 dark:bg-blue-900/20',
   }
   return (
-    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-5">
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-sm text-gray-500 dark:text-gray-400">{title}</span>
-        <div className={`w-8 h-8 ${bgMap[color] ?? 'bg-gray-50 dark:bg-gray-800'} rounded-lg flex items-center justify-center`}>
+    <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3 sm:p-5">
+      <div className="flex items-center justify-between mb-2 sm:mb-3">
+        <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">{title}</span>
+        <div className={`w-7 h-7 sm:w-8 sm:h-8 ${bgMap[color] ?? 'bg-gray-50 dark:bg-gray-800'} rounded-lg flex items-center justify-center`}>
           {icon}
         </div>
       </div>
-      <p className="text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
+      <p className="text-lg sm:text-2xl font-bold text-gray-900 dark:text-white">{value}</p>
     </div>
   )
 }

@@ -104,17 +104,17 @@ function ComandasPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 sm:p-6 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Comandas</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Comandas</h1>
           <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">{tabs.length} abertas</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
           className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
         >
-          <Plus size={16} />Nova Comanda
+          <Plus size={16} /><span className="hidden sm:inline">Nova </span>Comanda
         </button>
       </div>
 

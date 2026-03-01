@@ -70,12 +70,12 @@ function FuncionariosPage() {
   const isOwner = currentMembership?.role === 'owner'
 
   return (
-    <div className="p-6 space-y-5">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Funcionários</h1>
+    <div className="p-4 sm:p-6 space-y-5">
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Funcionários</h1>
         <Link
           to="/app/funcionarios/novo"
-          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+          className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-3 sm:px-4 py-2 rounded-lg text-sm font-medium transition-colors shrink-0"
         >
           <Plus size={16} />Convidar
         </Link>
@@ -90,7 +90,8 @@ function FuncionariosPage() {
         </div>
       ) : (
         <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-          <table className="w-full text-sm">
+          {/* Desktop table */}
+          <table className="w-full text-sm hidden md:table">
             <thead>
               <tr className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
                 <th className="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Nome</th>
@@ -148,6 +149,50 @@ function FuncionariosPage() {
               ))}
             </tbody>
           </table>
+
+          {/* Mobile card list */}
+          <div className="md:hidden divide-y divide-gray-100 dark:divide-gray-800">
+            {members.map((m) => (
+              <div key={m.id} className={`p-4 ${!m.active ? 'opacity-50' : ''}`}>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-700 dark:text-indigo-400 font-semibold text-sm shrink-0">
+                    {m.profiles?.name?.charAt(0).toUpperCase() ?? '?'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-800 dark:text-gray-200 truncate">{m.profiles?.name ?? '—'}</p>
+                    <div className="flex flex-wrap items-center gap-2 mt-1">
+                      {isOwner && m.role !== 'owner' ? (
+                        <select
+                          value={m.role}
+                          onChange={(e) => handleRoleChange(m.id, e.target.value)}
+                          className={`px-2 py-0.5 rounded-full text-xs font-medium border-0 focus:outline-none cursor-pointer ${roleColors[m.role] ?? ''}`}
+                        >
+                          <option value="admin">Admin</option>
+                          <option value="cashier">Caixa</option>
+                        </select>
+                      ) : (
+                        <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${roleColors[m.role] ?? ''}`}>
+                          {roleLabels[m.role] ?? m.role}
+                        </span>
+                      )}
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${m.active ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'}`}>
+                        {m.active ? 'Ativo' : 'Inativo'}
+                      </span>
+                    </div>
+                  </div>
+                  {isOwner && m.role !== 'owner' && (
+                    <button
+                      onClick={() => handleToggle(m.id, !m.active)}
+                      className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-400 p-1.5 shrink-0"
+                      title={m.active ? 'Desativar' : 'Ativar'}
+                    >
+                      {m.active ? <UserX size={18} /> : <UserCheck size={18} />}
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

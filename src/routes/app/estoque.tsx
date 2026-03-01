@@ -103,22 +103,22 @@ function EstoquePage() {
   const outOfStock = products.filter((p) => p.stock_qty <= 0)
 
   return (
-    <div className="p-6 space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Estoque</h1>
+    <div className="p-4 sm:p-6 space-y-6">
+      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Estoque</h1>
 
       {/* Summary */}
-      <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4 text-center">
-          <p className="text-2xl font-bold text-gray-900 dark:text-white">{products.length}</p>
-          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Produtos ativos</p>
+      <div className="grid grid-cols-3 gap-2 sm:gap-4">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-3 sm:p-4 text-center">
+          <p className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">{products.length}</p>
+          <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-1">Produtos ativos</p>
         </div>
-        <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800 p-4 text-center">
-          <p className="text-2xl font-bold text-amber-700 dark:text-amber-400">{lowStock.length}</p>
-          <p className="text-sm text-amber-600 dark:text-amber-400 mt-1">Estoque baixo</p>
+        <div className="bg-amber-50 dark:bg-amber-900/20 rounded-xl border border-amber-200 dark:border-amber-800 p-3 sm:p-4 text-center">
+          <p className="text-xl sm:text-2xl font-bold text-amber-700 dark:text-amber-400">{lowStock.length}</p>
+          <p className="text-xs sm:text-sm text-amber-600 dark:text-amber-400 mt-1">Estoque baixo</p>
         </div>
-        <div className="bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800 p-4 text-center">
-          <p className="text-2xl font-bold text-red-700 dark:text-red-400">{outOfStock.length}</p>
-          <p className="text-sm text-red-600 dark:text-red-400 mt-1">Sem estoque</p>
+        <div className="bg-red-50 dark:bg-red-900/20 rounded-xl border border-red-200 dark:border-red-800 p-3 sm:p-4 text-center">
+          <p className="text-xl sm:text-2xl font-bold text-red-700 dark:text-red-400">{outOfStock.length}</p>
+          <p className="text-xs sm:text-sm text-red-600 dark:text-red-400 mt-1">Sem estoque</p>
         </div>
       </div>
 

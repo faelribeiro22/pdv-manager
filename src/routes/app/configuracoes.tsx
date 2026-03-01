@@ -82,11 +82,11 @@ function ConfiguracoesPage() {
   }
 
   return (
-    <div className="p-6 max-w-2xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Configurações</h1>
+    <div className="p-4 sm:p-6 max-w-2xl mx-auto space-y-6">
+      <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">Configurações</h1>
 
       {/* Establishment info */}
-      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6">
         <h2 className="font-semibold text-gray-800 dark:text-gray-200 mb-4">Dados do Estabelecimento</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {error && <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg p-3 text-sm">{error}</div>}
@@ -140,7 +140,7 @@ function ConfiguracoesPage() {
 
       {/* Danger zone */}
       {isOwner && (
-        <div className="bg-white dark:bg-gray-900 rounded-xl border border-red-200 dark:border-red-800 p-6">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-red-200 dark:border-red-800 p-4 sm:p-6">
           <h2 className="font-semibold text-red-700 dark:text-red-400 mb-2 flex items-center gap-2">
             <AlertTriangle size={18} />Zona de Perigo
           </h2>

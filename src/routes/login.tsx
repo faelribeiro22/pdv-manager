@@ -39,7 +39,7 @@ function LoginPage() {
           <h1 className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">PDV Manager</h1>
           <p className="text-gray-500 dark:text-gray-400 mt-2">Acesse sua conta</p>
         </div>
-        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-8">
+        <div className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 sm:p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             {error && (
               <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg p-3 text-sm">

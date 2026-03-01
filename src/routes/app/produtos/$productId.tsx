@@ -118,15 +118,15 @@ function EditProductPage() {
   if (loading) return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Carregando...</div>
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
+    <div className="p-4 sm:p-6 max-w-2xl mx-auto">
       <div className="flex items-center gap-4 mb-6">
         <button onClick={() => navigate({ to: '/app/produtos' })} className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
           <ArrowLeft size={22} />
         </button>
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Editar Produto</h1>
+        <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">Editar Produto</h1>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6 space-y-5">
+      <form onSubmit={handleSubmit(onSubmit)} className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-4 sm:p-6 space-y-5">
         {error && <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg p-3 text-sm">{error}</div>}
 
         <div className="grid sm:grid-cols-2 gap-4">

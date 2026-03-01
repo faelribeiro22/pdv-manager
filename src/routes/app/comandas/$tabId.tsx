@@ -254,15 +254,15 @@ function TabDetailPage() {
   const elapsedMin = Math.floor((Date.now() - new Date(tab.opened_at).getTime()) / 60000)
 
   return (
-    <div className="p-6 max-w-3xl mx-auto space-y-6">
+    <div className="p-4 sm:p-6 max-w-3xl mx-auto space-y-4 sm:space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate({ to: '/app/comandas' })} className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
+        <button onClick={() => navigate({ to: '/app/comandas' })} className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200 shrink-0">
           <ArrowLeft size={22} />
         </button>
-        <div className="flex-1">
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">{tab.customer_name}</h1>
-          <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+        <div className="flex-1 min-w-0">
+          <h1 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate">{tab.customer_name}</h1>
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             {tab.table_number && <span>Mesa {tab.table_number}</span>}
             <span className="flex items-center gap-1"><Clock size={12} />{elapsedMin < 60 ? `${elapsedMin}min` : `${Math.floor(elapsedMin / 60)}h`}</span>
             <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${tab.status === 'open' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
@@ -273,9 +273,9 @@ function TabDetailPage() {
         {tab.status === 'open' && (
           <button
             onClick={() => setShowPayModal(true)}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors"
+            className="bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2 rounded-lg text-xs sm:text-sm font-semibold transition-colors shrink-0"
           >
-            Fechar Comanda
+            <span className="hidden sm:inline">Fechar </span>Comanda
           </button>
         )}
       </div>
@@ -361,7 +361,7 @@ function TabDetailPage() {
                 <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Pagamento</h2>
                 <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">{fmt(total)}</p>
 
-                <div className="grid grid-cols-4 gap-2 mb-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 mb-3">
                   {(Object.keys(paymentLabels) as Payment['type'][]).map((type) => (
                     <button
                       key={type}
