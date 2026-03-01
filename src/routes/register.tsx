@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
+import { createFileRoute, Link } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { supabase } from '../lib/supabase'
@@ -17,7 +17,6 @@ interface RegisterForm {
 }
 
 function RegisterPage() {
-  const navigate = useNavigate()
   const [step, setStep] = useState<1 | 2>(1)
   const [error, setError] = useState<string | null>(null)
   const { register, handleSubmit, getValues, formState: { isSubmitting, errors } } = useForm<RegisterForm>()
@@ -62,7 +61,8 @@ function RegisterPage() {
 
       // Membership is auto-created by DB trigger on establishment insert
 
-      navigate({ to: '/app' })
+      // Full reload to ensure auth context picks up the new establishment
+      window.location.href = '/app'
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erro ao criar conta')
     }
