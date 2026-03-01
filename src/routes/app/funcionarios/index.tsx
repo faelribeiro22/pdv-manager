@@ -7,7 +7,7 @@ import { createSupabaseServerClient } from '../../../lib/auth'
 import type { EstablishmentMember, Profile } from '../../../lib/database.types'
 
 const getMembersFn = createServerFn({ method: 'GET' })
-  .validator((id: string) => id)
+  .inputValidator((id: string) => id)
   .handler(async ({ data: establishmentId }) => {
     const supabase = createSupabaseServerClient()
     const { data } = await supabase
@@ -19,14 +19,14 @@ const getMembersFn = createServerFn({ method: 'GET' })
   })
 
 const toggleMemberFn = createServerFn({ method: 'POST' })
-  .validator((d: { memberId: string; active: boolean }) => d)
+  .inputValidator((d: { memberId: string; active: boolean }) => d)
   .handler(async ({ data }) => {
     const supabase = createSupabaseServerClient()
     await supabase.from('establishment_members').update({ active: data.active }).eq('id', data.memberId)
   })
 
 const updateRoleFn = createServerFn({ method: 'POST' })
-  .validator((d: { memberId: string; role: string }) => d)
+  .inputValidator((d: { memberId: string; role: string }) => d)
   .handler(async ({ data }) => {
     const supabase = createSupabaseServerClient()
     await supabase.from('establishment_members').update({ role: data.role as never }).eq('id', data.memberId)
@@ -34,9 +34,9 @@ const updateRoleFn = createServerFn({ method: 'POST' })
 
 const roleLabels: Record<string, string> = { owner: 'Proprietário', admin: 'Admin', cashier: 'Caixa' }
 const roleColors: Record<string, string> = {
-  owner: 'bg-purple-100 text-purple-700',
-  admin: 'bg-indigo-100 text-indigo-700',
-  cashier: 'bg-green-100 text-green-700',
+  owner: 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400',
+  admin: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-400',
+  cashier: 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400',
 }
 
 export const Route = createFileRoute('/app/funcionarios/')({
@@ -72,7 +72,7 @@ function FuncionariosPage() {
   return (
     <div className="p-6 space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Funcionários</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Funcionários</h1>
         <Link
           to="/app/funcionarios/novo"
           className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
@@ -82,32 +82,32 @@ function FuncionariosPage() {
       </div>
 
       {loading ? (
-        <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-16 bg-gray-100 rounded-xl animate-pulse" />)}</div>
+        <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-16 bg-gray-100 dark:bg-gray-800 rounded-xl animate-pulse" />)}</div>
       ) : members.length === 0 ? (
         <div className="text-center py-16 text-gray-400">
           <Users size={48} className="mx-auto mb-3 opacity-30" />
           <p>Nenhum funcionário</p>
         </div>
       ) : (
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
           <table className="w-full text-sm">
             <thead>
-              <tr className="bg-gray-50 border-b border-gray-200">
-                <th className="text-left px-4 py-3 font-semibold text-gray-600">Nome</th>
-                <th className="text-left px-4 py-3 font-semibold text-gray-600">Cargo</th>
-                <th className="text-center px-4 py-3 font-semibold text-gray-600">Status</th>
+              <tr className="bg-gray-50 dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700">
+                <th className="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Nome</th>
+                <th className="text-left px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Cargo</th>
+                <th className="text-center px-4 py-3 font-semibold text-gray-600 dark:text-gray-400">Status</th>
                 {isOwner && <th className="px-4 py-3" />}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
               {members.map((m) => (
-                <tr key={m.id} className={`hover:bg-gray-50 ${!m.active ? 'opacity-50' : ''}`}>
+                <tr key={m.id} className={`hover:bg-gray-50 dark:hover:bg-gray-800 ${!m.active ? 'opacity-50' : ''}`}>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-semibold text-sm shrink-0">
+                      <div className="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-700 dark:text-indigo-400 font-semibold text-sm shrink-0">
                         {m.profiles?.name?.charAt(0).toUpperCase() ?? '?'}
                       </div>
-                      <span className="font-medium text-gray-800">{m.profiles?.name ?? '—'}</span>
+                      <span className="font-medium text-gray-800 dark:text-gray-200">{m.profiles?.name ?? '—'}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -127,7 +127,7 @@ function FuncionariosPage() {
                     )}
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${m.active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-500'}`}>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${m.active ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-400'}`}>
                       {m.active ? 'Ativo' : 'Inativo'}
                     </span>
                   </td>
@@ -136,7 +136,7 @@ function FuncionariosPage() {
                       {m.role !== 'owner' && (
                         <button
                           onClick={() => handleToggle(m.id, !m.active)}
-                          className="text-gray-400 hover:text-gray-600"
+                          className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-400"
                           title={m.active ? 'Desativar' : 'Ativar'}
                         >
                           {m.active ? <UserX size={16} /> : <UserCheck size={16} />}

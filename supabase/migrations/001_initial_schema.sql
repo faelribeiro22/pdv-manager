@@ -198,7 +198,15 @@ create policy "Authenticated can create establishments" on public.establishments
 create policy "Members can read their establishment members" on public.establishment_members
   for select using (public.is_member_of(establishment_id) or public.is_super_admin());
 create policy "Admins can manage members" on public.establishment_members
-  for all using (public.is_admin_of(establishment_id) or public.is_super_admin());
+  for update using (public.is_admin_of(establishment_id) or public.is_super_admin());
+create policy "Admins can delete members" on public.establishment_members
+  for delete using (public.is_admin_of(establishment_id) or public.is_super_admin());
+create policy "Admins or owners can insert members" on public.establishment_members
+  for insert with check (
+    public.is_admin_of(establishment_id)
+    or exists (select 1 from public.establishments e where e.id = establishment_id and e.owner_id = auth.uid())
+    or public.is_super_admin()
+  );
 
 create policy "Members can read categories" on public.categories
   for select using (public.is_member_of(establishment_id) or public.is_super_admin());
@@ -242,6 +250,22 @@ create policy "Admins can delete tabs" on public.tabs
 
 create policy "Members can manage tab items" on public.tab_items
   for all using (exists (select 1 from public.tabs t where t.id = tab_id and public.is_member_of(t.establishment_id)));
+
+-- Auto-create owner membership when an establishment is created
+create or replace function public.handle_new_establishment()
+returns trigger language plpgsql security definer as $$
+begin
+  if new.owner_id is not null then
+    insert into public.establishment_members (establishment_id, user_id, role)
+    values (new.id, new.owner_id, 'owner')
+    on conflict (establishment_id, user_id) do nothing;
+  end if;
+  return new;
+end;
+$$;
+create trigger on_establishment_created
+  after insert on public.establishments
+  for each row execute function public.handle_new_establishment();
 
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer as $$

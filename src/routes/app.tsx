@@ -2,9 +2,11 @@ import { createFileRoute, Outlet, Link, useNavigate, useRouterState } from '@tan
 import { useState, useEffect } from 'react'
 import {
   LayoutDashboard, ShoppingCart, ClipboardList, Package, Warehouse,
-  Users, BarChart2, Settings, Menu, X, ChevronDown, LogOut, Building2
+  Users, BarChart2, Settings, Menu, ChevronDown, LogOut, Building2, Plus
 } from 'lucide-react'
 import { useAuth } from '../contexts/auth-context'
+import { supabase } from '../lib/supabase'
+import ThemeToggle from '../components/ThemeToggle'
 
 export const Route = createFileRoute('/app')({
   component: AppLayout,
@@ -26,7 +28,6 @@ function AppLayout() {
   const navigate = useNavigate()
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const [estabMenuOpen, setEstabMenuOpen] = useState(false)
-  const [userMenuOpen, setUserMenuOpen] = useState(false)
   const location = useRouterState({ select: (s) => s.location.pathname })
 
   useEffect(() => {
@@ -37,10 +38,10 @@ function AppLayout() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950">
         <div className="text-center">
           <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
-          <p className="text-gray-500 text-sm">Carregando...</p>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Carregando...</p>
         </div>
       </div>
     )
@@ -48,42 +49,47 @@ function AppLayout() {
 
   if (!user) return null
 
+  // No establishments — show onboarding
+  if (establishments.length === 0) {
+    return <NoEstablishmentState />
+  }
+
   const isAdmin = currentMembership?.role === 'owner' || currentMembership?.role === 'admin'
   const filteredNav = navItems.filter((item) => !item.adminOnly || isAdmin)
 
   const SidebarContent = () => (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="px-4 py-5 border-b border-gray-200">
+      <div className="px-4 py-5 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center">
             <ShoppingCart size={16} className="text-white" />
           </div>
-          <span className="font-bold text-gray-900">PDV Manager</span>
+          <span className="font-bold text-gray-900 dark:text-white">PDV Manager</span>
         </div>
       </div>
 
       {/* Establishment selector */}
       {establishments.length > 0 && (
-        <div className="px-3 py-3 border-b border-gray-200">
+        <div className="px-3 py-3 border-b border-gray-200 dark:border-gray-700">
           <div className="relative">
             <button
               onClick={() => setEstabMenuOpen(!estabMenuOpen)}
-              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 text-left"
+              className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-left"
             >
-              <Building2 size={16} className="text-indigo-600 shrink-0" />
-              <span className="text-sm font-medium text-gray-800 flex-1 truncate">
+              <Building2 size={16} className="text-indigo-600 dark:text-indigo-400 shrink-0" />
+              <span className="text-sm font-medium text-gray-800 dark:text-gray-200 flex-1 truncate">
                 {currentEstablishment?.name ?? 'Selecionar'}
               </span>
               {establishments.length > 1 && <ChevronDown size={14} className="text-gray-400" />}
             </button>
             {estabMenuOpen && establishments.length > 1 && (
-              <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg z-50">
                 {establishments.map((e) => (
                   <button
                     key={e.id}
                     onClick={() => { setCurrentEstablishment(e.id); setEstabMenuOpen(false) }}
-                    className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 first:rounded-t-lg last:rounded-b-lg ${e.id === currentEstablishment?.id ? 'text-indigo-600 font-medium' : 'text-gray-700'}`}
+                    className={`w-full text-left px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-800 first:rounded-t-lg last:rounded-b-lg ${e.id === currentEstablishment?.id ? 'text-indigo-600 dark:text-indigo-400 font-medium' : 'text-gray-700 dark:text-gray-300'}`}
                   >
                     {e.name}
                   </button>
@@ -105,8 +111,8 @@ function AppLayout() {
               onClick={() => setSidebarOpen(false)}
               className={`flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                 active
-                  ? 'bg-indigo-50 text-indigo-700'
-                  : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                  ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-400'
+                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 hover:text-gray-900 dark:hover:text-white'
               }`}
             >
               <Icon size={18} />
@@ -116,15 +122,20 @@ function AppLayout() {
         })}
       </nav>
 
+      {/* Theme toggle */}
+      <div className="px-3 py-2">
+        <ThemeToggle compact />
+      </div>
+
       {/* User menu bottom */}
-      <div className="px-3 py-4 border-t border-gray-200">
+      <div className="px-3 py-4 border-t border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-3 px-3 py-2">
-          <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-semibold text-sm">
+          <div className="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-700 dark:text-indigo-400 font-semibold text-sm">
             {profile?.name?.charAt(0).toUpperCase() ?? '?'}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-gray-800 truncate">{profile?.name}</p>
-            <p className="text-xs text-gray-500 truncate">{currentMembership?.role}</p>
+            <p className="text-sm font-medium text-gray-800 dark:text-gray-200 truncate">{profile?.name}</p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{currentMembership?.role}</p>
           </div>
           <button
             onClick={signOut}
@@ -139,9 +150,9 @@ function AppLayout() {
   )
 
   return (
-    <div className="flex h-screen bg-gray-50 overflow-hidden">
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-950 overflow-hidden">
       {/* Desktop Sidebar */}
-      <aside className="hidden md:flex w-64 flex-col bg-white border-r border-gray-200 shrink-0">
+      <aside className="hidden md:flex w-64 flex-col bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 shrink-0">
         <SidebarContent />
       </aside>
 
@@ -149,7 +160,7 @@ function AppLayout() {
       {sidebarOpen && (
         <div className="fixed inset-0 z-40 md:hidden">
           <div className="absolute inset-0 bg-black/40" onClick={() => setSidebarOpen(false)} />
-          <aside className="absolute left-0 top-0 bottom-0 w-64 bg-white border-r border-gray-200 z-50">
+          <aside className="absolute left-0 top-0 bottom-0 w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 z-50">
             <SidebarContent />
           </aside>
         </div>
@@ -158,11 +169,11 @@ function AppLayout() {
       {/* Main content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar (mobile) */}
-        <header className="md:hidden flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-200">
-          <button onClick={() => setSidebarOpen(true)} className="text-gray-600">
+        <header className="md:hidden flex items-center gap-3 px-4 py-3 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+          <button onClick={() => setSidebarOpen(true)} className="text-gray-600 dark:text-gray-400">
             <Menu size={22} />
           </button>
-          <span className="font-semibold text-gray-800 flex-1">{currentEstablishment?.name ?? 'PDV Manager'}</span>
+          <span className="font-semibold text-gray-800 dark:text-gray-200 flex-1">{currentEstablishment?.name ?? 'PDV Manager'}</span>
           <button onClick={signOut} className="text-gray-400 hover:text-red-500">
             <LogOut size={18} />
           </button>
@@ -171,6 +182,124 @@ function AppLayout() {
         <main className="flex-1 overflow-y-auto">
           <Outlet />
         </main>
+      </div>
+    </div>
+  )
+}
+
+function NoEstablishmentState() {
+  const { signOut, refreshEstablishments, user } = useAuth()
+  const [name, setName] = useState('')
+  const [address, setAddress] = useState('')
+  const [phone, setPhone] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleCreate = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!name.trim() || !user) return
+    setSubmitting(true)
+    setError(null)
+    try {
+      const slug = name
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '') + '-' + Math.random().toString(36).slice(2, 6)
+
+      const { error: insertErr } = await supabase
+        .from('establishments')
+        .insert({
+          name: name.trim(),
+          slug,
+          address: address.trim() || null,
+          phone: phone.trim() || null,
+          owner_id: user.id,
+        })
+      if (insertErr) throw insertErr
+
+      // Membership is auto-created by DB trigger
+      await refreshEstablishments()
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Erro ao criar estabelecimento')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-950 px-4">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <div className="mx-auto w-16 h-16 bg-indigo-100 dark:bg-indigo-900/30 rounded-2xl flex items-center justify-center mb-4">
+            <Building2 size={32} className="text-indigo-600 dark:text-indigo-400" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Criar estabelecimento</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-2 text-sm">
+            Você ainda não tem um estabelecimento. Crie um para começar a usar o sistema.
+          </p>
+        </div>
+
+        <form onSubmit={handleCreate} className="bg-white dark:bg-gray-900 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 space-y-4">
+          {error && (
+            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg p-3 text-sm">
+              {error}
+            </div>
+          )}
+
+          <div>
+            <label htmlFor="estab-name" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome do estabelecimento *</label>
+            <input
+              id="estab-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              placeholder="Ex: Loja do João"
+              required
+            />
+          </div>
+
+          <div>
+            <label htmlFor="estab-address" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Endereço (opcional)</label>
+            <input
+              id="estab-address"
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              placeholder="Rua, número, bairro"
+            />
+          </div>
+
+          <div>
+            <label htmlFor="estab-phone" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Telefone (opcional)</label>
+            <input
+              id="estab-phone"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+              placeholder="(00) 00000-0000"
+            />
+          </div>
+
+          <button
+            type="submit"
+            disabled={submitting || !name.trim()}
+            className="w-full bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 text-white font-semibold rounded-lg py-2.5 text-sm transition-colors flex items-center justify-center gap-2"
+          >
+            <Plus size={16} />
+            {submitting ? 'Criando...' : 'Criar estabelecimento'}
+          </button>
+        </form>
+
+        <button
+          type="button"
+          onClick={signOut}
+          className="mt-4 w-full text-center text-sm text-gray-500 dark:text-gray-400 hover:text-red-500 transition-colors flex items-center justify-center gap-1"
+        >
+          <LogOut size={14} />
+          Sair da conta
+        </button>
       </div>
     </div>
   )

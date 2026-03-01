@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
 * {
   box-sizing: border-box;
 }
@@ -10,4 +12,24 @@ html, body, #app {
 
 body {
   margin: 0;
+}
+
+/* Dark mode — form controls */
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+.dark textarea,
+.dark select {
+  background-color: theme(colors.gray.800) !important;
+  border-color: theme(colors.gray.600) !important;
+  color: theme(colors.gray.200) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: theme(colors.gray.500) !important;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: theme(colors.indigo.500) !important;
 }

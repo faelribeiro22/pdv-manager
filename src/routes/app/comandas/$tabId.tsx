@@ -9,7 +9,7 @@ import type { Tab, TabItem, Product } from '../../../lib/database.types'
 const fmt = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v)
 
 const getTabFn = createServerFn({ method: 'GET' })
-  .validator((id: string) => id)
+  .inputValidator((id: string) => id)
   .handler(async ({ data: tabId }) => {
     const supabase = createSupabaseServerClient()
     const { data } = await supabase
@@ -21,7 +21,7 @@ const getTabFn = createServerFn({ method: 'GET' })
   })
 
 const searchProductsForTab = createServerFn({ method: 'GET' })
-  .validator((d: { establishmentId: string; query: string }) => d)
+  .inputValidator((d: { establishmentId: string; query: string }) => d)
   .handler(async ({ data }) => {
     const supabase = createSupabaseServerClient()
     const { data: products } = await supabase
@@ -35,7 +35,7 @@ const searchProductsForTab = createServerFn({ method: 'GET' })
   })
 
 const addTabItemFn = createServerFn({ method: 'POST' })
-  .validator((d: { tabId: string; productId: string; qty: number; unitPrice: number; subtotal: number; addedBy: string }) => d)
+  .inputValidator((d: { tabId: string; productId: string; qty: number; unitPrice: number; subtotal: number; addedBy: string }) => d)
   .handler(async ({ data }) => {
     const supabase = createSupabaseServerClient()
     const { error } = await supabase.from('tab_items').insert({
@@ -57,7 +57,7 @@ const addTabItemFn = createServerFn({ method: 'POST' })
   })
 
 const removeTabItemFn = createServerFn({ method: 'POST' })
-  .validator((d: { tabItemId: string; tabId: string }) => d)
+  .inputValidator((d: { tabItemId: string; tabId: string }) => d)
   .handler(async ({ data }) => {
     const supabase = createSupabaseServerClient()
     await supabase.from('tab_items').delete().eq('id', data.tabItemId)
@@ -70,7 +70,7 @@ const removeTabItemFn = createServerFn({ method: 'POST' })
   })
 
 const closeTabFn = createServerFn({ method: 'POST' })
-  .validator((d: {
+  .inputValidator((d: {
     tabId: string; establishmentId: string; employeeId: string
     payments: Array<{ type: string; amount: number; receivedAmount?: number; changeAmount?: number }>
     total: number
@@ -247,8 +247,8 @@ function TabDetailPage() {
     }
   }
 
-  if (loading) return <div className="p-8 text-center text-gray-500">Carregando...</div>
-  if (!tab) return <div className="p-8 text-center text-gray-500">Comanda não encontrada.</div>
+  if (loading) return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Carregando...</div>
+  if (!tab) return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Comanda não encontrada.</div>
 
   const items = tab.tab_items ?? []
   const elapsedMin = Math.floor((Date.now() - new Date(tab.opened_at).getTime()) / 60000)
@@ -257,15 +257,15 @@ function TabDetailPage() {
     <div className="p-6 max-w-3xl mx-auto space-y-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <button onClick={() => navigate({ to: '/app/comandas' })} className="text-gray-500 hover:text-gray-800">
+        <button onClick={() => navigate({ to: '/app/comandas' })} className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200">
           <ArrowLeft size={22} />
         </button>
         <div className="flex-1">
-          <h1 className="text-xl font-bold text-gray-900">{tab.customer_name}</h1>
-          <div className="flex items-center gap-3 text-sm text-gray-500 mt-0.5">
+          <h1 className="text-xl font-bold text-gray-900 dark:text-white">{tab.customer_name}</h1>
+          <div className="flex items-center gap-3 text-sm text-gray-500 dark:text-gray-400 mt-0.5">
             {tab.table_number && <span>Mesa {tab.table_number}</span>}
             <span className="flex items-center gap-1"><Clock size={12} />{elapsedMin < 60 ? `${elapsedMin}min` : `${Math.floor(elapsedMin / 60)}h`}</span>
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${tab.status === 'open' ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${tab.status === 'open' ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}>
               {tab.status === 'open' ? 'Aberta' : 'Fechada'}
             </span>
           </div>
@@ -289,19 +289,19 @@ function TabDetailPage() {
               value={productQuery}
               onChange={(e) => setProductQuery(e.target.value)}
               placeholder="Adicionar produto..."
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
           </div>
           {productResults.length > 0 && (
-            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg z-10 max-h-48 overflow-y-auto">
+            <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-lg z-10 max-h-48 overflow-y-auto">
               {productResults.map((p) => (
                 <button
                   key={p.id}
                   onClick={() => addProduct(p)}
-                  className="w-full text-left px-4 py-3 hover:bg-gray-50 border-b border-gray-100 last:border-0 flex justify-between items-center"
+                  className="w-full text-left px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 border-b border-gray-100 dark:border-gray-800 last:border-0 flex justify-between items-center"
                 >
-                  <span className="text-sm font-medium text-gray-800">{p.name}</span>
-                  <span className="text-sm font-bold text-indigo-600">{fmt(p.price)}</span>
+                  <span className="text-sm font-medium text-gray-800 dark:text-gray-200">{p.name}</span>
+                  <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">{fmt(p.price)}</span>
                 </button>
               ))}
             </div>
@@ -310,21 +310,21 @@ function TabDetailPage() {
       )}
 
       {/* Items */}
-      <div className="bg-white rounded-xl border border-gray-200">
-        <div className="px-4 py-3 border-b border-gray-200">
-          <h2 className="font-semibold text-gray-800">Itens ({items.length})</h2>
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700">
+        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="font-semibold text-gray-800 dark:text-gray-200">Itens ({items.length})</h2>
         </div>
         {items.length === 0 ? (
           <p className="text-center py-8 text-gray-400 text-sm">Nenhum item na comanda</p>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-gray-100 dark:divide-gray-800">
             {items.map((item) => (
               <div key={item.id} className="flex items-center gap-3 px-4 py-3">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-800">{(item as any).products?.name ?? '—'}</p>
-                  <p className="text-xs text-gray-500">{item.qty}x {fmt(item.unit_price)}</p>
+                  <p className="text-sm font-medium text-gray-800 dark:text-gray-200">{(item as any).products?.name ?? '—'}</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">{item.qty}x {fmt(item.unit_price)}</p>
                 </div>
-                <span className="font-bold text-gray-800">{fmt(item.subtotal)}</span>
+                <span className="font-bold text-gray-800 dark:text-gray-200">{fmt(item.subtotal)}</span>
                 {tab.status === 'open' && (
                   <button onClick={() => removeItem(item.id)} className="text-gray-300 hover:text-red-400">
                     <Trash2 size={15} />
@@ -334,21 +334,21 @@ function TabDetailPage() {
             ))}
           </div>
         )}
-        <div className="px-4 py-3 border-t border-gray-200 flex justify-between font-bold text-gray-900">
+        <div className="px-4 py-3 border-t border-gray-200 dark:border-gray-700 flex justify-between font-bold text-gray-900 dark:text-white">
           <span>Total</span>
-          <span className="text-indigo-600">{fmt(tab.total)}</span>
+          <span className="text-indigo-600 dark:text-indigo-400">{fmt(tab.total)}</span>
         </div>
       </div>
 
       {/* Payment modal */}
       {showPayModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 max-w-md w-full mx-4">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl p-6 max-w-md w-full mx-4">
             {closed ? (
               <div className="text-center py-4">
                 <CheckCircle size={48} className="text-green-500 mx-auto mb-3" />
-                <h2 className="text-xl font-bold text-gray-900 mb-1">Comanda Fechada!</h2>
-                <p className="text-3xl font-bold text-indigo-600 mb-6">{fmt(total)}</p>
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Comanda Fechada!</h2>
+                <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-6">{fmt(total)}</p>
                 <button
                   onClick={() => navigate({ to: '/app/comandas' })}
                   className="w-full bg-indigo-600 text-white py-3 rounded-xl font-semibold"
@@ -358,15 +358,15 @@ function TabDetailPage() {
               </div>
             ) : (
               <>
-                <h2 className="text-lg font-bold text-gray-900 mb-1">Pagamento</h2>
-                <p className="text-2xl font-bold text-indigo-600 mb-4">{fmt(total)}</p>
+                <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-1">Pagamento</h2>
+                <p className="text-2xl font-bold text-indigo-600 dark:text-indigo-400 mb-4">{fmt(total)}</p>
 
                 <div className="grid grid-cols-4 gap-2 mb-3">
                   {(Object.keys(paymentLabels) as Payment['type'][]).map((type) => (
                     <button
                       key={type}
                       onClick={() => setActiveType(type)}
-                      className={`py-2 rounded-lg text-xs font-medium transition-colors ${activeType === type ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600'}`}
+                      className={`py-2 rounded-lg text-xs font-medium transition-colors ${activeType === type ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'}`}
                     >
                       {paymentLabels[type]}
                     </button>
@@ -379,15 +379,15 @@ function TabDetailPage() {
                     value={cashReceived}
                     onChange={(e) => setCashReceived(e.target.value)}
                     placeholder="Valor recebido"
-                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 )}
 
                 {payments.length > 0 && (
                   <div className="space-y-1 mb-3">
                     {payments.map((p, i) => (
-                      <div key={i} className="flex items-center justify-between text-sm bg-green-50 rounded px-3 py-1.5">
-                        <span className="text-gray-600">{paymentLabels[p.type]}</span>
+                      <div key={i} className="flex items-center justify-between text-sm bg-green-50 dark:bg-green-900/20 rounded px-3 py-1.5">
+                        <span className="text-gray-600 dark:text-gray-400">{paymentLabels[p.type]}</span>
                         <span className="font-medium">{fmt(p.amount)}</span>
                         <button onClick={() => setPayments((prev) => prev.filter((_, j) => j !== i))} className="text-gray-400 hover:text-red-400 ml-2">
                           <X size={12} />
@@ -395,19 +395,19 @@ function TabDetailPage() {
                       </div>
                     ))}
                     {remaining > 0.01 && (
-                      <p className="text-xs text-amber-600 font-medium px-1">Faltam {fmt(remaining)}</p>
+                      <p className="text-xs text-amber-600 dark:text-amber-400 font-medium px-1">Faltam {fmt(remaining)}</p>
                     )}
                   </div>
                 )}
 
                 {remaining > 0.01 && (
-                  <button onClick={addPayment} className="w-full py-2 border border-indigo-300 text-indigo-600 rounded-lg text-sm font-medium hover:bg-indigo-50 mb-3">
+                  <button onClick={addPayment} className="w-full py-2 border border-indigo-300 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 rounded-lg text-sm font-medium hover:bg-indigo-50 dark:hover:bg-indigo-900/20 mb-3">
                     + Adicionar pagamento
                   </button>
                 )}
 
                 <div className="flex gap-3">
-                  <button onClick={() => setShowPayModal(false)} className="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-lg text-sm font-medium">
+                  <button onClick={() => setShowPayModal(false)} className="flex-1 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 py-2.5 rounded-lg text-sm font-medium">
                     Cancelar
                   </button>
                   <button

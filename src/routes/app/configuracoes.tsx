@@ -7,7 +7,7 @@ import { useAuth } from '../../contexts/auth-context'
 import { createSupabaseServerClient } from '../../lib/auth'
 
 const updateEstablishmentFn = createServerFn({ method: 'POST' })
-  .validator((d: { id: string; name: string; address?: string; phone?: string }) => d)
+  .inputValidator((d: { id: string; name: string; address?: string; phone?: string }) => d)
   .handler(async ({ data }) => {
     const supabase = createSupabaseServerClient()
     const { error } = await supabase.from('establishments').update({
@@ -20,7 +20,7 @@ const updateEstablishmentFn = createServerFn({ method: 'POST' })
   })
 
 const deactivateEstablishmentFn = createServerFn({ method: 'POST' })
-  .validator((id: string) => id)
+  .inputValidator((id: string) => id)
   .handler(async ({ data }) => {
     const supabase = createSupabaseServerClient()
     await supabase.from('establishments').update({ active: false }).eq('id', data)
@@ -78,51 +78,51 @@ function ConfiguracoesPage() {
   const isOwner = currentMembership?.role === 'owner'
 
   if (!currentEstablishment) {
-    return <div className="p-8 text-center text-gray-500">Nenhum estabelecimento selecionado.</div>
+    return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Nenhum estabelecimento selecionado.</div>
   }
 
   return (
     <div className="p-6 max-w-2xl mx-auto space-y-6">
-      <h1 className="text-2xl font-bold text-gray-900">Configurações</h1>
+      <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Configurações</h1>
 
       {/* Establishment info */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6">
-        <h2 className="font-semibold text-gray-800 mb-4">Dados do Estabelecimento</h2>
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <h2 className="font-semibold text-gray-800 dark:text-gray-200 mb-4">Dados do Estabelecimento</h2>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {error && <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg p-3 text-sm">{error}</div>}
-          {saved && <div className="bg-green-50 border border-green-200 text-green-700 rounded-lg p-3 text-sm">Alterações salvas!</div>}
+          {error && <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 rounded-lg p-3 text-sm">{error}</div>}
+          {saved && <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-400 rounded-lg p-3 text-sm">Alterações salvas!</div>}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Nome do estabelecimento *</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Nome do estabelecimento *</label>
             <input
               {...register('name', { required: true })}
               disabled={!isOwner}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Endereço</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Endereço</label>
             <input
               {...register('address')}
               disabled={!isOwner}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400"
               placeholder="Rua, número, bairro"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Telefone</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Telefone</label>
             <input
               {...register('phone')}
               disabled={!isOwner}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-500"
+              className="w-full border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:bg-gray-50 dark:disabled:bg-gray-800 disabled:text-gray-500 dark:disabled:text-gray-400"
               placeholder="(00) 00000-0000"
             />
           </div>
 
           <div className="pt-1">
-            <p className="text-xs text-gray-400 mb-1">Plano: <span className="font-medium text-gray-600 capitalize">{currentEstablishment.plan}</span></p>
+            <p className="text-xs text-gray-400 mb-1">Plano: <span className="font-medium text-gray-600 dark:text-gray-400 capitalize">{currentEstablishment.plan}</span></p>
           </div>
 
           {isOwner && (
@@ -140,23 +140,23 @@ function ConfiguracoesPage() {
 
       {/* Danger zone */}
       {isOwner && (
-        <div className="bg-white rounded-xl border border-red-200 p-6">
-          <h2 className="font-semibold text-red-700 mb-2 flex items-center gap-2">
+        <div className="bg-white dark:bg-gray-900 rounded-xl border border-red-200 dark:border-red-800 p-6">
+          <h2 className="font-semibold text-red-700 dark:text-red-400 mb-2 flex items-center gap-2">
             <AlertTriangle size={18} />Zona de Perigo
           </h2>
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
             Desativar o estabelecimento irá encerrar o acesso de todos os funcionários. Esta ação pode ser revertida por um super administrador.
           </p>
           {!confirmDeactivate ? (
             <button
               onClick={() => setConfirmDeactivate(true)}
-              className="border border-red-300 text-red-600 hover:bg-red-50 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+              className="border border-red-300 dark:border-red-700 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 px-4 py-2 rounded-lg text-sm font-medium transition-colors"
             >
               Desativar estabelecimento
             </button>
           ) : (
             <div className="flex items-center gap-3">
-              <p className="text-sm text-red-600 font-medium">Tem certeza?</p>
+              <p className="text-sm text-red-600 dark:text-red-400 font-medium">Tem certeza?</p>
               <button
                 onClick={handleDeactivate}
                 className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm font-semibold"
@@ -165,7 +165,7 @@ function ConfiguracoesPage() {
               </button>
               <button
                 onClick={() => setConfirmDeactivate(false)}
-                className="border border-gray-300 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50"
+                className="border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-50 dark:hover:bg-gray-800"
               >
                 Cancelar
               </button>

@@ -10,7 +10,7 @@ const fmt = (v: number) => new Intl.NumberFormat('pt-BR', { style: 'currency', c
 
 // Server functions
 const searchProductsFn = createServerFn({ method: 'GET' })
-  .validator((d: { establishmentId: string; query: string; categoryId?: string }) => d)
+  .inputValidator((d: { establishmentId: string; query: string; categoryId?: string }) => d)
   .handler(async ({ data }) => {
     const supabase = createSupabaseServerClient()
     let q = supabase
@@ -32,7 +32,7 @@ const searchProductsFn = createServerFn({ method: 'GET' })
   })
 
 const getCategoriesFn = createServerFn({ method: 'GET' })
-  .validator((id: string) => id)
+  .inputValidator((id: string) => id)
   .handler(async ({ data: establishmentId }) => {
     const supabase = createSupabaseServerClient()
     const { data } = await supabase
@@ -44,7 +44,7 @@ const getCategoriesFn = createServerFn({ method: 'GET' })
   })
 
 const createSaleFn = createServerFn({ method: 'POST' })
-  .validator((d: {
+  .inputValidator((d: {
     establishmentId: string
     employeeId: string
     items: Array<{ productId: string; qty: number; unitPrice: number; subtotal: number }>
@@ -297,15 +297,15 @@ function CaixaPage() {
   }
 
   if (!currentEstablishment) {
-    return <div className="p-8 text-center text-gray-500">Nenhum estabelecimento selecionado.</div>
+    return <div className="p-8 text-center text-gray-500 dark:text-gray-400">Nenhum estabelecimento selecionado.</div>
   }
 
   return (
     <div className="flex h-full">
       {/* Left: products */}
-      <div className="flex-1 flex flex-col border-r border-gray-200 overflow-hidden">
+      <div className="flex-1 flex flex-col border-r border-gray-200 dark:border-gray-700 overflow-hidden">
         {/* Search + category filter */}
-        <div className="p-4 border-b border-gray-200 bg-white space-y-3">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 space-y-3">
           <div className="relative">
             <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
             <input
@@ -313,11 +313,11 @@ function CaixaPage() {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Buscar produto ou código de barras..."
-              className="w-full pl-9 pr-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full pl-9 pr-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
               autoFocus
             />
             {query && (
-              <button onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+              <button onClick={() => setQuery('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-400">
                 <X size={14} />
               </button>
             )}
@@ -325,7 +325,7 @@ function CaixaPage() {
           <div className="flex gap-2 overflow-x-auto pb-1">
             <button
               onClick={() => setCategoryId(undefined)}
-              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${!categoryId ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${!categoryId ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
             >
               Todos
             </button>
@@ -333,7 +333,7 @@ function CaixaPage() {
               <button
                 key={cat.id}
                 onClick={() => setCategoryId(cat.id === categoryId ? undefined : cat.id)}
-                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${categoryId === cat.id ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${categoryId === cat.id ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
               >
                 {cat.name}
               </button>
@@ -358,14 +358,14 @@ function CaixaPage() {
                     key={product.id}
                     onClick={() => !outOfStock && addToCart(product)}
                     disabled={outOfStock}
-                    className={`text-left bg-white border rounded-xl p-3 hover:border-indigo-300 hover:shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed ${lowStock ? 'border-amber-300' : 'border-gray-200'}`}
+                    className={`text-left bg-white dark:bg-gray-900 border rounded-xl p-3 hover:border-indigo-300 dark:hover:border-indigo-600 hover:shadow-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed ${lowStock ? 'border-amber-300 dark:border-amber-700' : 'border-gray-200 dark:border-gray-700'}`}
                   >
-                    <div className="w-full aspect-square bg-gray-100 rounded-lg mb-2 flex items-center justify-center">
+                    <div className="w-full aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg mb-2 flex items-center justify-center">
                       <Package size={28} className="text-gray-300" />
                     </div>
-                    <p className="text-xs font-semibold text-gray-800 truncate">{product.name}</p>
-                    <p className="text-sm font-bold text-indigo-600 mt-1">{fmt(product.price)}</p>
-                    <div className={`mt-1 text-xs px-1.5 py-0.5 rounded inline-block ${outOfStock ? 'bg-red-100 text-red-600' : lowStock ? 'bg-amber-100 text-amber-600' : 'bg-green-100 text-green-600'}`}>
+                    <p className="text-xs font-semibold text-gray-800 dark:text-gray-200 truncate">{product.name}</p>
+                    <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400 mt-1">{fmt(product.price)}</p>
+                    <div className={`mt-1 text-xs px-1.5 py-0.5 rounded inline-block ${outOfStock ? 'bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400' : lowStock ? 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' : 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400'}`}>
                       {outOfStock ? 'Sem estoque' : `${product.stock_qty} ${product.unit}`}
                     </div>
                   </button>
@@ -377,9 +377,9 @@ function CaixaPage() {
       </div>
 
       {/* Right: cart */}
-      <div className="w-80 lg:w-96 flex flex-col bg-white">
-        <div className="px-4 py-3 border-b border-gray-200">
-          <h2 className="font-semibold text-gray-800">Carrinho {cart.length > 0 && <span className="text-indigo-600">({cart.length})</span>}</h2>
+      <div className="w-80 lg:w-96 flex flex-col bg-white dark:bg-gray-900">
+        <div className="px-4 py-3 border-b border-gray-200 dark:border-gray-700">
+          <h2 className="font-semibold text-gray-800 dark:text-gray-200">Carrinho {cart.length > 0 && <span className="text-indigo-600 dark:text-indigo-400">({cart.length})</span>}</h2>
         </div>
 
         {/* Cart items */}
@@ -392,21 +392,21 @@ function CaixaPage() {
           ) : (
             <div className="space-y-2">
               {cart.map((item) => (
-                <div key={item.product.id} className="flex items-center gap-2 py-2 border-b border-gray-100">
+                <div key={item.product.id} className="flex items-center gap-2 py-2 border-b border-gray-100 dark:border-gray-800">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-gray-800 truncate">{item.product.name}</p>
-                    <p className="text-xs text-gray-500">{fmt(item.unitPrice)} / un</p>
+                    <p className="text-xs font-medium text-gray-800 dark:text-gray-200 truncate">{item.product.name}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{fmt(item.unitPrice)} / un</p>
                   </div>
                   <div className="flex items-center gap-1">
-                    <button onClick={() => updateQty(item.product.id, -1)} className="w-6 h-6 rounded bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
+                    <button onClick={() => updateQty(item.product.id, -1)} className="w-6 h-6 rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center">
                       <Minus size={10} />
                     </button>
                     <span className="text-sm font-semibold w-6 text-center">{item.qty}</span>
-                    <button onClick={() => updateQty(item.product.id, 1)} className="w-6 h-6 rounded bg-gray-100 hover:bg-gray-200 flex items-center justify-center">
+                    <button onClick={() => updateQty(item.product.id, 1)} className="w-6 h-6 rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center">
                       <Plus size={10} />
                     </button>
                   </div>
-                  <span className="text-xs font-bold text-gray-800 w-16 text-right">{fmt(item.subtotal)}</span>
+                  <span className="text-xs font-bold text-gray-800 dark:text-gray-200 w-16 text-right">{fmt(item.subtotal)}</span>
                   <button onClick={() => removeFromCart(item.product.id)} className="text-gray-300 hover:text-red-400">
                     <Trash2 size={14} />
                   </button>
@@ -417,12 +417,12 @@ function CaixaPage() {
         </div>
 
         {/* Totals + Payment */}
-        <div className="px-4 py-4 border-t border-gray-200 space-y-3">
+        <div className="px-4 py-4 border-t border-gray-200 dark:border-gray-700 space-y-3">
           <div className="space-y-1 text-sm">
-            <div className="flex justify-between text-gray-500">
+            <div className="flex justify-between text-gray-500 dark:text-gray-400">
               <span>Subtotal</span><span>{fmt(subtotal)}</span>
             </div>
-            <div className="flex justify-between items-center text-gray-500">
+            <div className="flex justify-between items-center text-gray-500 dark:text-gray-400">
               <span>Desconto</span>
               <div className="flex items-center gap-1">
                 <span className="text-gray-400">R$</span>
@@ -432,25 +432,25 @@ function CaixaPage() {
                   step="0.01"
                   value={discount || ''}
                   onChange={(e) => setDiscount(Math.min(Number(e.target.value), subtotal))}
-                  className="w-20 text-right border border-gray-200 rounded px-2 py-0.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="w-20 text-right border border-gray-200 dark:border-gray-700 rounded px-2 py-0.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                   placeholder="0,00"
                 />
               </div>
             </div>
-            <div className="flex justify-between font-bold text-gray-900 text-base pt-1 border-t border-gray-200">
-              <span>Total</span><span className="text-indigo-600">{fmt(total)}</span>
+            <div className="flex justify-between font-bold text-gray-900 dark:text-white text-base pt-1 border-t border-gray-200 dark:border-gray-700">
+              <span>Total</span><span className="text-indigo-600 dark:text-indigo-400">{fmt(total)}</span>
             </div>
           </div>
 
           {/* Payment methods */}
           <div>
-            <p className="text-xs font-medium text-gray-600 mb-2">Forma de Pagamento</p>
+            <p className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">Forma de Pagamento</p>
             <div className="grid grid-cols-4 gap-1 mb-2">
               {(Object.keys(paymentLabels) as Payment['type'][]).map((type) => (
                 <button
                   key={type}
                   onClick={() => setActivePaymentType(type)}
-                  className={`py-1.5 rounded text-xs font-medium transition-colors ${activePaymentType === type ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                  className={`py-1.5 rounded text-xs font-medium transition-colors ${activePaymentType === type ? 'bg-indigo-600 text-white' : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700'}`}
                 >
                   {paymentLabels[type]}
                 </button>
@@ -463,10 +463,10 @@ function CaixaPage() {
                   value={cashReceived}
                   onChange={(e) => setCashReceived(e.target.value)}
                   placeholder="Valor recebido"
-                  className="flex-1 border border-gray-300 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  className="flex-1 border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
                 />
                 {cashReceived && Number(cashReceived.replace(',', '.')) > remaining && (
-                  <span className="text-xs text-green-600 font-medium self-center">
+                  <span className="text-xs text-green-600 dark:text-green-400 font-medium self-center">
                     Troco: {fmt(Number(cashReceived.replace(',', '.')) - remaining)}
                   </span>
                 )}
@@ -475,7 +475,7 @@ function CaixaPage() {
             {payments.length > 0 && (
               <div className="space-y-1 mb-2">
                 {payments.map((p, i) => (
-                  <div key={i} className="flex items-center justify-between text-xs text-gray-600 bg-green-50 rounded px-2 py-1">
+                  <div key={i} className="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400 bg-green-50 dark:bg-green-900/20 rounded px-2 py-1">
                     <span>{paymentLabels[p.type]}</span>
                     <span className="font-medium">{fmt(p.amount)}</span>
                     <button onClick={() => removePayment(i)} className="text-gray-400 hover:text-red-400 ml-2">
@@ -484,7 +484,7 @@ function CaixaPage() {
                   </div>
                 ))}
                 {remaining > 0.01 && (
-                  <div className="flex justify-between text-xs font-medium text-amber-600 px-2">
+                  <div className="flex justify-between text-xs font-medium text-amber-600 dark:text-amber-400 px-2">
                     <span>Faltam</span><span>{fmt(remaining)}</span>
                   </div>
                 )}
@@ -494,7 +494,7 @@ function CaixaPage() {
               <button
                 onClick={addPayment}
                 disabled={cart.length === 0}
-                className="w-full py-2 border border-indigo-300 text-indigo-600 rounded-lg text-sm font-medium hover:bg-indigo-50 disabled:opacity-40 transition-colors"
+                className="w-full py-2 border border-indigo-300 dark:border-indigo-700 text-indigo-600 dark:text-indigo-400 rounded-lg text-sm font-medium hover:bg-indigo-50 dark:hover:bg-indigo-900/20 disabled:opacity-40 transition-colors"
               >
                 + Adicionar pagamento
               </button>
@@ -516,11 +516,11 @@ function CaixaPage() {
       {/* Success modal */}
       {successSale && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 max-w-sm w-full mx-4 text-center">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl p-8 max-w-sm w-full mx-4 text-center">
             <CheckCircle size={56} className="text-green-500 mx-auto mb-4" />
-            <h2 className="text-xl font-bold text-gray-900 mb-1">Venda Finalizada!</h2>
-            <p className="text-gray-500 text-sm mb-2">#{successSale.id.slice(-8).toUpperCase()}</p>
-            <p className="text-3xl font-bold text-indigo-600 mb-6">{fmt(successSale.total)}</p>
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Venda Finalizada!</h2>
+            <p className="text-gray-500 dark:text-gray-400 text-sm mb-2">#{successSale.id.slice(-8).toUpperCase()}</p>
+            <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400 mb-6">{fmt(successSale.total)}</p>
             <button
               onClick={() => setSuccessSale(null)}
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-xl transition-colors"
