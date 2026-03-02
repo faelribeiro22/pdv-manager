@@ -154,6 +154,7 @@ function CaixaPage() {
   const [discount, setDiscount] = useState(0)
   const [payments, setPayments] = useState<Payment[]>([])
   const [activePaymentType, setActivePaymentType] = useState<Payment['type']>('cash')
+  const [paymentAmount, setPaymentAmount] = useState('')
   const [cashReceived, setCashReceived] = useState('')
   const [successSale, setSuccessSale] = useState<{ id: string; total: number } | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -229,6 +230,20 @@ function CaixaPage() {
     )
   }
 
+  const setQty = (productId: string, qty: number) => {
+    if (qty <= 0) {
+      removeFromCart(productId)
+      return
+    }
+    setCart((prev) =>
+      prev.map((i) =>
+        i.product.id === productId
+          ? { ...i, qty, subtotal: qty * i.unitPrice }
+          : i
+      )
+    )
+  }
+
   const removeFromCart = (productId: string) => {
     setCart((prev) => prev.filter((i) => i.product.id !== productId))
   }
@@ -240,18 +255,20 @@ function CaixaPage() {
 
   const addPayment = () => {
     if (remaining <= 0) return
-    const amount = activePaymentType === 'cash' && cashReceived
-      ? Math.min(Number(cashReceived.replace(',', '.')), remaining + 0.01)
-      : remaining
+    const inputAmount = paymentAmount ? Number(paymentAmount.replace(',', '.')) : remaining
+    const amount = Math.min(Math.max(0, inputAmount), remaining)
+    if (amount <= 0) return
+
     const received = activePaymentType === 'cash' && cashReceived ? Number(cashReceived.replace(',', '.')) : undefined
-    const change = received && received > remaining ? received - remaining : undefined
+    const change = received && received > amount ? received - amount : undefined
 
     setPayments((prev) => [...prev, {
       type: activePaymentType,
-      amount: Math.min(amount, remaining),
+      amount,
       receivedAmount: received,
       changeAmount: change,
     }])
+    setPaymentAmount('')
     setCashReceived('')
   }
 
@@ -289,6 +306,8 @@ function CaixaPage() {
       setCart([])
       setDiscount(0)
       setPayments([])
+      setPaymentAmount('')
+      setCashReceived('')
       loadProducts('', undefined)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Erro ao finalizar venda')
@@ -322,7 +341,19 @@ function CaixaPage() {
                   <button onClick={() => updateQty(item.product.id, -1)} className="w-7 h-7 sm:w-6 sm:h-6 rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center">
                     <Minus size={10} />
                   </button>
-                  <span className="text-sm font-semibold w-6 text-center">{item.qty}</span>
+                  <input
+                    type="number"
+                    min="1"
+                    value={item.qty}
+                    onChange={(e) => {
+                      const val = parseInt(e.target.value)
+                      if (val > 0) setQty(item.product.id, val)
+                    }}
+                    onBlur={(e) => {
+                      if (!e.target.value || parseInt(e.target.value) <= 0) setQty(item.product.id, 1)
+                    }}
+                    className="text-sm font-semibold w-10 text-center border border-gray-200 dark:border-gray-700 rounded px-0.5 py-0.5 focus:outline-none focus:ring-1 focus:ring-indigo-500 bg-transparent [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
                   <button onClick={() => updateQty(item.product.id, 1)} className="w-7 h-7 sm:w-6 sm:h-6 rounded bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 flex items-center justify-center">
                     <Plus size={10} />
                   </button>
@@ -377,22 +408,48 @@ function CaixaPage() {
               </button>
             ))}
           </div>
-          {activePaymentType === 'cash' && (
-            <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={cashReceived}
-                onChange={(e) => setCashReceived(e.target.value)}
-                placeholder="Valor recebido"
-                className="flex-1 border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
-              />
-              {cashReceived && Number(cashReceived.replace(',', '.')) > remaining && (
-                <span className="text-xs text-green-600 dark:text-green-400 font-medium self-center whitespace-nowrap">
-                  Troco: {fmt(Number(cashReceived.replace(',', '.')) - remaining)}
-                </span>
+          <div className="space-y-2 mb-2">
+            <div className="flex gap-2">
+              <div className="flex-1 relative">
+                <span className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-400 text-xs">R$</span>
+                <input
+                  type="text"
+                  value={paymentAmount}
+                  onChange={(e) => setPaymentAmount(e.target.value)}
+                  placeholder={remaining.toFixed(2).replace('.', ',')}
+                  className="w-full pl-7 pr-2 py-1.5 border border-gray-300 dark:border-gray-600 rounded text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                />
+              </div>
+              {remaining > 0.01 && payments.length > 0 && (
+                <button
+                  onClick={() => setPaymentAmount(remaining.toFixed(2).replace('.', ','))}
+                  className="text-xs text-indigo-600 dark:text-indigo-400 font-medium whitespace-nowrap px-2 border border-indigo-200 dark:border-indigo-800 rounded hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                >
+                  Restante
+                </button>
               )}
             </div>
-          )}
+            {activePaymentType === 'cash' && (
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={cashReceived}
+                  onChange={(e) => setCashReceived(e.target.value)}
+                  placeholder="Valor recebido (troco)"
+                  className="flex-1 border border-gray-300 dark:border-gray-600 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                />
+                {cashReceived && (() => {
+                  const payAmt = paymentAmount ? Number(paymentAmount.replace(',', '.')) : remaining
+                  const recv = Number(cashReceived.replace(',', '.'))
+                  return recv > payAmt ? (
+                    <span className="text-xs text-green-600 dark:text-green-400 font-medium self-center whitespace-nowrap">
+                      Troco: {fmt(recv - payAmt)}
+                    </span>
+                  ) : null
+                })()}
+              </div>
+            )}
+          </div>
           {payments.length > 0 && (
             <div className="space-y-1 mb-2">
               {payments.map((p, i) => (
